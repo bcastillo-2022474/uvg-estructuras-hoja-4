@@ -4,8 +4,10 @@ import java.util.List;
 
 public class Main implements Calc {
     public static void main(String[] args) {
-        double value = new Main().operate("1 2 +");
-        System.out.println(value);
+        Main calc = new Main();
+        System.out.println("1 2 + = " + calc.operate("1 2 +"));
+        System.out.println("5 3 + 2 * = " + calc.operate("5 3 + 2 *"));
+        System.out.println("10 2 - 4 / = " + calc.operate("10 2 - 4 /"));
     }
 
     @Override

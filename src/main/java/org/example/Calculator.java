@@ -43,17 +43,16 @@ public class Calculator {
 
         }
 
-        System.out.println(stack);
+        Token result = stack.pop();
 
-        if (tokens.getFirst().type.equals("OPERATOR")) {
-            throw new RuntimeException("Operator was defined but not enough operants were given");
+        try {
+            stack.pop();
+            throw new RuntimeException("Not enough operators were given");
+        } catch (IllegalArgumentException e) {
+            // Stack is empty, which is correct - we have exactly one result
         }
 
-        if (tokens.size() > 1) {
-            throw new RuntimeException("Operator was given but not enough operators were given");
-        }
-
-        return Double.parseDouble(tokens.getFirst().value);
+        return Double.parseDouble(result.value);
     }
 }
 
