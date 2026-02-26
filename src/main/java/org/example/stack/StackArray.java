@@ -1,4 +1,4 @@
-package org.example;
+package org.example.stack;
 
 public class StackArray<T> implements Stack<T> {
     public static int MAX_INITIAL_LENGTH = 10;

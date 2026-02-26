@@ -1,4 +1,4 @@
-package org.example;
+package org.example.stack;
 
 /**
  * Generic stack interface with basic operations
