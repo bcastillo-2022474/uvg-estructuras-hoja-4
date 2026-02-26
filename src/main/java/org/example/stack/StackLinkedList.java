@@ -6,7 +6,7 @@ import org.example.linkedlist.ILinkedList;
  * Stack implementation backed by a linked list (singly or doubly linked).
  * @param <T> Type of elements stored in the stack
  */
-public class StackLinkedList<T> implements Stack<T> {
+public class StackLinkedList<T> extends AbstractStack<T> {
     private final ILinkedList<T> list;
 
     public StackLinkedList(ILinkedList<T> list) {

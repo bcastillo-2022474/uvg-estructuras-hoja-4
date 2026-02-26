@@ -9,10 +9,9 @@ class LinkedNode<T> {
     }
 }
 
-public class LinkedList<T> implements ILinkedList<T> {
+public class LinkedList<T> extends AbstractLinkedList<T> {
     private LinkedNode<T> firstElement;
     private LinkedNode<T> lastElement;
-    private int size;
 
     @Override
     public void Add(T element) {
@@ -80,16 +79,6 @@ public class LinkedList<T> implements ILinkedList<T> {
         }
         toRemove.next = null;
         size--;
-    }
-
-    @Override
-    public int Size() {
-        return size;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return size == 0;
     }
 
     private LinkedNode<T> getNode(int position) {

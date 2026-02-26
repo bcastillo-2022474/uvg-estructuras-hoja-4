@@ -1,77 +1,96 @@
-# Calculadora Postfija
+# Calculadora Infix
 
-Aplicación Java que evalúa expresiones en notación postfija (Reverse Polish Notation).
+Aplicación Java que evalúa expresiones en notación **infix** (la notación matemática estándar). El programa las convierte internamente a notación postfija y las evalúa usando una pila.
 
-## ¿Qué es notación postfija?
+## Características
 
-En notación postfija, los operadores se colocan después de los operandos:
-- `1 2 +` significa `1 + 2 = 3`
-- `5 3 + 2 *` significa `(5 + 3) * 2 = 16`
+- Convierte expresiones infix a postfix automáticamente
+- Soporta paréntesis y precedencia de operadores (`*`, `/` antes que `+`, `-`)
+- Soporta números multi-dígito y decimales
+- Permite elegir la implementación de pila al iniciar el programa
+- Lee las expresiones desde el archivo `datos.txt`
 
-## Cómo ejecutar el programa
+## Arquitectura
 
-### Opción 1: Con Maven (recomendado)
+El proyecto implementa los ADTs de **Pila** y **Lista** con la jerarquía completa:
 
-Si tienes Maven instalado:
+```
+Stack<T>  (interfaz)
+  └── AbstractStack<T>  (clase abstracta)
+        ├── StackArrayList<T>   — respaldado por java.util.ArrayList
+        ├── StackArray<T>       — respaldado por arreglo nativo
+        └── StackLinkedList<T>  — respaldado por ILinkedList
+
+ILinkedList<T>  (interfaz)
+  └── AbstractLinkedList<T>  (clase abstracta)
+        ├── LinkedList<T>         — simplemente encadenada
+        └── DoubleLinkedList<T>   — doblemente encadenada
+```
+
+### Patrones de diseño
+
+- **Factory** — `StackFactory` y `ListFactory` crean la implementación elegida por el usuario
+- **Singleton** — `Calculator` garantiza una sola instancia del evaluador
+
+## Cómo ejecutar
 
 ```bash
 mvn compile exec:java -Dexec.mainClass="org.example.Main"
 ```
 
-### Opción 2: Con Java puro (sin Maven)
+Al iniciar, el programa pregunta:
 
-Si solo tienes Java instalado:
-
-```bash
-# Compilar
-javac -d target/classes src/main/java/org/example/*.java
-
-# Ejecutar
-java -cp target/classes org.example.Main
+```
+Seleccione la implementación de pila:
+1. ArrayList
+2. Array (Vector)
+3. Lista enlazada
+Opción:
 ```
 
-## Uso
+Si se elige **3. Lista enlazada**, pregunta además:
 
-### Opción 1: Leer desde archivo
-
-El programa lee operaciones del archivo `datos.txt` (una operación por línea). Esta es la opción activa por defecto.
-
-### Opción 2: Operaciones directas en código
-
-Editar `Main.java` y descomentar las líneas:
-
-```java
-// System.out.println("1 2 + = " + calc.operate("1 2 +"));
+```
+Seleccione la implementación de lista:
+1. Simplemente encadenada
+2. Doblemente encadenada
+Opción:
 ```
 
-Luego comentar la línea:
-```java
-calc.processFile("datos.txt");
+Luego lee y evalúa cada expresión de `datos.txt`:
+
+```
+Línea 1: (10+20)*9 = 270.0
+Línea 2: 1+2*9 = 19.0
+...
 ```
 
 ## Formato de datos.txt
 
-Una operación por línea, operandos y operadores separados por espacios:
+Una expresión infix por línea. Soporta espacios o sin espacios:
 
 ```
-1 2 +
-5 3 -
-4 5 *
-20 4 /
-5 3 + 2 *
+(10+20)*9
+1+2*9
+(1+2)*9
+(5+3)*(2-1)
 ```
 
 ## Operadores soportados
 
-- `+` Suma
-- `-` Resta
-- `*` Multiplicación
-- `/` División
+| Operador | Operación      | Precedencia |
+|----------|----------------|-------------|
+| `*`      | Multiplicación | Alta        |
+| `/`      | División       | Alta        |
+| `+`      | Suma           | Baja        |
+| `-`      | Resta          | Baja        |
+
+Los paréntesis `( )` pueden usarse para forzar el orden de evaluación.
 
 ## Ejecutar tests
-
-Los tests requieren Maven:
 
 ```bash
 mvn test
 ```
+
+85 tests cubriendo: `StackArray`, `StackArrayList`, `StackLinkedList`, `LinkedList`, `DoubleLinkedList`, `InfixParser`, `Parser`, y la evaluación completa end-to-end.

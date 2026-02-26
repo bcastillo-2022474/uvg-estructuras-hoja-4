@@ -10,10 +10,9 @@ class Node<T> {
     }
 }
 
-public class DoubleLinkedList<T> implements ILinkedList<T> {
+public class DoubleLinkedList<T> extends AbstractLinkedList<T> {
     private Node<T> firstElement;
     private Node<T> lastElement;
-    private int size;
 
     @Override
     public void Add(T element) {
@@ -91,16 +90,6 @@ public class DoubleLinkedList<T> implements ILinkedList<T> {
         node.prev = null;
         node.next = null;
         size--;
-    }
-
-    @Override
-    public int Size() {
-        return size;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return size == 0;
     }
 
     private Node<T> getNode(int position) {

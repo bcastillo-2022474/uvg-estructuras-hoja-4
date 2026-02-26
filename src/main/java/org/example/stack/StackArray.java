@@ -1,6 +1,6 @@
 package org.example.stack;
 
-public class StackArray<T> implements Stack<T> {
+public class StackArray<T> extends AbstractStack<T> {
     public static int MAX_INITIAL_LENGTH = 10;
     private T[] items;
     int topIndex = -1;
