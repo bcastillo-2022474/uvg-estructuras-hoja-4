@@ -1,5 +1,11 @@
 # Reflexión sobre el Patrón de Diseño Singleton
 
+**Autores:**
+- Joao Castillo — 25776
+- Kenett Ortega — 25777
+
+**Repositorio:** https://github.com/bcastillo-2022474/uvg-estructuras-hoja-4
+
 ## ¿Qué es el patrón Singleton?
 
 El patrón Singleton garantiza que una clase tenga **una única instancia** durante toda la ejecución del programa, y proporciona un punto de acceso global a ella. Se implementa con un constructor privado y un método estático `getInstance()` que crea la instancia solo la primera vez que se invoca.

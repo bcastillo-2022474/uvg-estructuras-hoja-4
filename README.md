@@ -1,5 +1,11 @@
 # Calculadora Infix
 
+**Autores:**
+- Joao Castillo — 25776
+- Kenett Ortega — 25777
+
+**Repositorio:** https://github.com/bcastillo-2022474/uvg-estructuras-hoja-4
+
 Aplicación Java que evalúa expresiones en notación **infix** (la notación matemática estándar). El programa las convierte internamente a notación postfija y las evalúa usando una pila.
 
 ## Características

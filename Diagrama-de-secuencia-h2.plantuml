@@ -1,103 +1,88 @@
 @startuml
-title Diagrama de Secuencia - Evaluación Postfix "1 2 + 4 * 3 +" (Versión Corregida)
+title Diagrama de Secuencia - Evaluación Infix "(10+20)*9"
 
 actor Usuario
 participant ":Main" as Main
+participant ":StackFactory" as SF
+participant ":ListFactory" as LF
+participant ":InfixParser" as IP
 participant ":Parser" as Parser
-participant ":Calculator" as Calculator
+participant ":Calculator" as Calc
 participant ":Stack<Token>" as Stack
 
 Usuario -> Main: main(args)
 activate Main
 
-Main -> Main: new Main()
-note right: Crea instancia con\nStackArrayList por defecto
+Main -> Usuario: Mostrar menú de pila\n(1:ArrayList, 2:Array, 3:Lista)
+Usuario -> Main: Selección (ej. 3)
 
-Main -> Usuario: Mostrar menú de selección
-Usuario -> Main: Seleccionar implementación\n(1: ArrayList, 2: Array)
-Main -> Main: setStackImplementation(stack)
-note right: Configura implementación\nde pila según selección
+opt stackType == 3
+    Main -> Usuario: Mostrar menú de lista\n(1:Simplemente, 2:Doblemente)
+    Usuario -> Main: Selección (ej. 1)
+end
 
 Main -> Main: processFile("datos.txt")
 Main -> Main: readFile("datos.txt")
-note right: Lee todas las líneas\ndel archivo
 
 loop cada línea del archivo
-    Main -> Main: operate("1 2 + 4 * 3 +")
 
-    == Fase 1: Parseo ==
+    Main -> Main: operate("(10+20)*9")
+
+    == Fase 1: Infix → Postfix ==
+    Main -> IP: new InfixParser()
+    activate IP
+    Main -> IP: toPostfix("(10+20)*9")
+    IP --> Main: "10 20 + 9 *"
+    deactivate IP
+
+    == Fase 2: Tokenización ==
     Main -> Parser: new Parser()
     activate Parser
-    Main -> Parser: parse("1 2 + 4 * 3 +")
-
-    loop cada elemento separado por espacio
-        Parser -> Parser: identificar tipo (OPERAND/OPERATOR)
-        Parser -> Parser: crear Token(type, value)
-    end
-    Parser --> Main: List<Token>
+    Main -> Parser: parse("10 20 + 9 *")
+    Parser --> Main: [OPERAND:10, OPERAND:20, OPERATOR:+, OPERAND:9, OPERATOR:*]
     deactivate Parser
 
-    == Fase 2: Evaluación ==
-    Main -> Stack: new Stack<Token>()
-    activate Stack
-    note right: Crea nueva instancia\npara esta operación
+    == Fase 3: Crear pila (Factory) ==
+    Main -> SF: createStack(stackType, listType)
+    activate SF
+    opt stackType == 3
+        SF -> LF: createList(listType)
+        activate LF
+        LF --> SF: LinkedList / DoubleLinkedList
+        deactivate LF
+    end
+    SF --> Main: Stack<Token>
+    deactivate SF
 
-    Main -> Calculator: new Calculator(stack)
-    activate Calculator
-    Main -> Calculator: operate(tokens)
+    == Fase 4: Evaluación (Singleton) ==
+    Main -> Calc: getInstance()
+    activate Calc
+    Main -> Calc: operate(tokens, stack)
 
-    note over Calculator, Stack
-      Tokens: [1, 2, +, 4, *, 3, +]
-    end note
+    Calc -> Stack: push(OPERAND:10)
+    Calc -> Stack: push(OPERAND:20)
+    Calc -> Stack: pop()
+    Stack --> Calc: OPERAND:20
+    Calc -> Stack: pop()
+    Stack --> Calc: OPERAND:10
+    Calc -> Calc: 10 + 20 = 30
+    Calc -> Stack: push(OPERAND:30)
 
-    Calculator -> Stack: push(Token("OPERAND","1"))
-    note right of Stack: [1]
+    Calc -> Stack: push(OPERAND:9)
+    Calc -> Stack: pop()
+    Stack --> Calc: OPERAND:9
+    Calc -> Stack: pop()
+    Stack --> Calc: OPERAND:30
+    Calc -> Calc: 30 * 9 = 270
+    Calc -> Stack: push(OPERAND:270)
 
-    Calculator -> Stack: push(Token("OPERAND","2"))
-    note right of Stack: [1, 2]
+    Calc -> Stack: pop()
+    Stack --> Calc: OPERAND:270
+    Calc --> Main: 270.0
+    deactivate Calc
 
-    Calculator -> Stack: pop()
-    Stack --> Calculator: Token("OPERAND","2")
-    Calculator -> Stack: pop()
-    Stack --> Calculator: Token("OPERAND","1")
-    Calculator -> Calculator: 1 + 2 = 3
-    Calculator -> Stack: push(Token("OPERAND","3"))
-    note right of Stack: [3]
+    Main --> Usuario: "Línea 1: (10+20)*9 = 270.0"
 
-    Calculator -> Stack: push(Token("OPERAND","4"))
-    note right of Stack: [3, 4]
-
-    Calculator -> Stack: pop()
-    Stack --> Calculator: Token("OPERAND","4")
-    Calculator -> Stack: pop()
-    Stack --> Calculator: Token("OPERAND","3")
-    Calculator -> Calculator: 3 * 4 = 12
-    Calculator -> Stack: push(Token("OPERAND","12"))
-    note right of Stack: [12]
-
-    Calculator -> Stack: push(Token("OPERAND","3"))
-    note right of Stack: [12, 3]
-
-    Calculator -> Stack: pop()
-    Stack --> Calculator: Token("OPERAND","3")
-    Calculator -> Stack: pop()
-    Stack --> Calculator: Token("OPERAND","12")
-    Calculator -> Calculator: 12 + 3 = 15
-    Calculator -> Stack: push(Token("OPERAND","15"))
-    note right of Stack: [15]
-
-    Calculator -> Stack: pop()
-    Stack --> Calculator: Token("OPERAND","15")
-    note right of Stack: []
-
-    Calculator -> Stack: pop()
-    Stack --> Calculator: IllegalArgumentException\n(stack vacío - correcto)
-
-    Calculator --> Main: 15.0
-    deactivate Calculator
-    deactivate Stack
-
-    Main --> Usuario: "Line 1: 1 2 + 4 * 3 + = 15.0"
 end
 
 deactivate Main

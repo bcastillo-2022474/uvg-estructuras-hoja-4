@@ -4,44 +4,181 @@
 top to bottom direction
 skinparam linetype ortho
 
+' ==================== INTERFACES ====================
 interface Calc << interface >> {
   + operate(String): double
 }
-class Calculator {
-  + Calculator(): 
-  + operate(List<Token>): double
+
+interface Stack<T> << interface >> {
+  + push(T): void
+  + pop(): T
+  + peek(): T
 }
-class Main {
-  + Main(): 
-  + main(String[]): void
-  + readFile(String): List<String>
-  + operate(String): double
-  + processFile(String): void
+
+interface ILinkedList<T> << interface >> {
+  + Add(T): void
+  + Insert(int, T): void
+  + Get(int): T
+  + Remove(int): void
+  + Size(): int
+  + isEmpty(): boolean
 }
+
 interface Operation << interface >> {
   + operate(double, double): double
 }
+
+' ==================== ABSTRACT CLASSES ====================
+abstract class AbstractStack<T> {
+  + {abstract} push(T): void
+  + {abstract} pop(): T
+  + {abstract} peek(): T
+  + isEmpty(): boolean
+}
+
+abstract class AbstractLinkedList<T> {
+  # size: int
+  + {abstract} Add(T): void
+  + {abstract} Insert(int, T): void
+  + {abstract} Get(int): T
+  + {abstract} Remove(int): void
+  + Size(): int
+  + isEmpty(): boolean
+}
+
+' ==================== STACK IMPLEMENTATIONS ====================
+class StackArrayList<T> {
+  - items: List<T>
+  + StackArrayList()
+  + StackArrayList(int)
+  + push(T): void
+  + pop(): T
+  + peek(): T
+}
+
+class StackArray<T> {
+  - items: T[]
+  - topIndex: int
+  + StackArray()
+  + StackArray(int)
+  + push(T): void
+  + pop(): T
+  + peek(): T
+}
+
+class StackLinkedList<T> {
+  - list: ILinkedList<T>
+  + StackLinkedList(ILinkedList<T>)
+  + push(T): void
+  + pop(): T
+  + peek(): T
+}
+
+' ==================== LIST IMPLEMENTATIONS ====================
+class LinkedList<T> {
+  - firstElement: LinkedNode<T>
+  - lastElement: LinkedNode<T>
+  + Add(T): void
+  + Insert(int, T): void
+  + Get(int): T
+  + Remove(int): void
+}
+
+class DoubleLinkedList<T> {
+  - firstElement: Node<T>
+  - lastElement: Node<T>
+  + Add(T): void
+  + Insert(int, T): void
+  + Get(int): T
+  + Remove(int): void
+}
+
+' ==================== PARSER ====================
 class Parser {
-  + Parser(): 
   + parse(String): List<Token>
 }
-interface Stack<T> << interface >> {
-  + peek(): T
-  + push(T): void
-  + pop(): T
+
+class InfixParser {
+  + toPostfix(String): String
+  - tokenize(String): List<String>
+  - precedence(String): int
+  - isNumber(String): boolean
 }
-class StackArrayList<T> {
-  + StackArrayList(int): 
-  + StackArrayList(): 
-  + push(T): void
-  + pop(): T
-  + peek(): T
-}
+
 class Token {
-  + Token(String, String): 
+  + type: String
+  + value: String
+  + Token(String, String)
   + toString(): String
 }
 
-Main            -[#008200,dashed]-^  Calc           
-StackArrayList  -[#008200,dashed]-^  Stack          
+' ==================== CALCULATOR (Singleton) ====================
+class Calculator {
+  - {static} instance: Calculator
+  - operators: HashMap<String, Operation>
+  - Calculator()
+  + {static} getInstance(): Calculator
+  + operate(List<Token>, Stack<Token>): double
+}
+
+' ==================== FACTORIES ====================
+class StackFactory {
+  + {static} createStack(int): Stack<Token>
+  + {static} createStack(int, int): Stack<Token>
+}
+
+class ListFactory {
+  + {static} createList(int): ILinkedList<Token>
+}
+
+' ==================== MAIN ====================
+class Main {
+  - stackType: int
+  - listType: int
+  + Main()
+  + Main(int, int)
+  + {static} main(String[]): void
+  + operate(String): double
+  + processFile(String): void
+  + readFile(String): List<String>
+}
+
+' ==================== RELATIONSHIPS ====================
+
+' Stack hierarchy
+AbstractStack        ..|>  Stack
+StackArrayList       --|>  AbstractStack
+StackArray           --|>  AbstractStack
+StackLinkedList      --|>  AbstractStack
+StackLinkedList      o-->  ILinkedList
+
+' List hierarchy
+AbstractLinkedList   ..|>  ILinkedList
+LinkedList           --|>  AbstractLinkedList
+DoubleLinkedList     --|>  AbstractLinkedList
+
+' Main
+Main                 ..|>  Calc
+Main                 ..>   StackFactory
+Main                 ..>   InfixParser
+Main                 ..>   Parser
+Main                 ..>   Calculator
+
+' Calculator
+Calculator           ..>   Stack
+Calculator           ..>   Token
+Calculator           o-->  Operation
+
+' Factories
+StackFactory         ..>   StackArrayList
+StackFactory         ..>   StackArray
+StackFactory         ..>   StackLinkedList
+StackFactory         ..>   ListFactory
+ListFactory          ..>   LinkedList
+ListFactory          ..>   DoubleLinkedList
+
+' Parser
+Parser               ..>   Token
+InfixParser          ..>   StackArrayList
+
 @enduml
