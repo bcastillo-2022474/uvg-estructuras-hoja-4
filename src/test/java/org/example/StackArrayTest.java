@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.stack.Stack;
+import org.example.stack.StackArray;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

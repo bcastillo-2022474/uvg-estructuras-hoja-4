@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.parser.Parser;
+import org.example.parser.Token;
 import org.junit.jupiter.api.Test;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
